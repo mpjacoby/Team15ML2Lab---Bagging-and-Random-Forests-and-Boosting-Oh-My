@@ -55,7 +55,7 @@ rf.boston = randomForest(medv~., data=Boston, subset=train, mtry=6, importance=T
 yhat.rf = predict(rf.boston, newdata=Boston[-train,])
 mean((yhat.rf - boston.test)^2)
 ```
-Test set is lower than before, so random forests is an improvement over bagging in this case.
+Test set MSE is lower than before, so random forests is an improvement over bagging in this case.
 
 Use importance() to view the importance of each variable:
 
