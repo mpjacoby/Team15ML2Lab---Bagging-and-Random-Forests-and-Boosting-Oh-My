@@ -27,7 +27,7 @@ bag.boston
 
 ## How well does this bagged model perform?
 
-Argument mtry=13 indicates that all 13 predictors should be considered for each split of the tree.
+Argument mtry = 13 indicates that all 13 predictors should be considered for each split of the tree.
 Bagged model performance on the test set:
 
 ```{r model on test set}
@@ -39,7 +39,7 @@ mean((yhat.bag - boston.test)^2)
 ```
 
 Test MSE may differ from the book depending on version of R. 
-Change number of trees by adjusting _____ argument.
+Change number of trees by adjusting ntree argument.
 ```{r}
 bag.boston = randomForest(medv~., data=Boston, subset=train, mtry=13, ntree=25)
 yhat.bag = predict(bag.boston, newdata=Boston[-train,])
