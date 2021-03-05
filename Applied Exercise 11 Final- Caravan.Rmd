@@ -1,0 +1,77 @@
+---
+title: "Applied Exercise 11 - Caravan"
+author: "Group 15"
+date: "2/28/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Applied Exercise 11
+
+(a) Create a training set consisting of the first 1,000 observations,
+and a test set consisting of the remaining observations.
+
+```{r }
+library(ISLR)
+data(Caravan)
+Caravan$Purchase <- ifelse(Caravan$Purchase == 'Yes',1,0)
+Caravan$Purchase <- as.factor(Caravan$Purchase)
+library(randomForest)
+#Train <- Caravan[1:1000,]
+#Test <- Caravan[-(1:1000),]
+Train = sample(1:1000, 1000)
+caravan.test = Caravan[-Train, "Purchase"]
+```
+
+(b) Fit a boosting model to the training set with Purchase as the
+response and the other variables as predictors. Use 1,000 trees,
+and a shrinkage value of 0.01. Which predictors appear to be
+the most important?
+
+```{r, warning=FALSE}
+library(gbm)
+set.seed (1)
+boost.caravan <- gbm(Purchase~., data=Caravan[Train,], distribution="bernoulli", n.trees=1000, interaction.depth=4, shrinkage=0.01)
+summary(boost.caravan)
+```
+
+(c) Use the boosting model to predict the response on the test data.
+Predict that a person will make a purchase if the estimated probability
+of purchase is greater than 20 %. Form a confusion matrix.
+What fraction of the people predicted to make a purchase
+do in fact make one?
+
+```{r}
+prob.boost <- predict(boost.caravan, newdata=Caravan[-Train,], n.trees=1000, type = 'response')
+pred.boost <- ifelse(prob.boost > .2,1,0)
+table(caravan.test,pred.boost)
+
+```
+~15.7% of persons predicted to make a purchase actually did
+
+How does this compare with the results obtained from applying KNN or logistic regression to this data
+set?
+
+```{r,warning=FALSE}
+library(caret)
+
+Caravan$Purchase <- as.factor(Caravan$Purchase)
+caravan.test <- as.factor(caravan.test)
+
+knn_model <- train(Purchase~., data = Caravan[Train,], preProcess = c('center','scale'))
+logistic_model <- glm(Purchase~., data = Caravan[Train,], family = binomial)
+
+
+knn_prob <- predict(knn_model,newdata = Caravan[-Train,], type = 'prob')
+knn_pred <- ifelse(knn_prob[2] > .2,1,0)
+table(caravan.test,knn_pred)
+logistic_prob <- predict(logistic_model,Caravan[-Train,],type = 'response')
+logistic_pred <- ifelse(logistic_prob > .2,1,0)
+table(caravan.test,logistic_pred)
+
+```
+21.4% of persons predicted by the KNN model made a purchase
+16.6% of persons predicted by the logistic regression made a purchase 

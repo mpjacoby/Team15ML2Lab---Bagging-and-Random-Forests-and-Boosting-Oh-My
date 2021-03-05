@@ -1,0 +1,66 @@
+---
+title: "8.3.4 Boosting"
+author: "Group 15"
+date: "2/28/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+## Accessing packages and setting train and test variables ##
+```{r cars}
+library(MASS) # to get Boston data
+data(Boston)
+library (gbm)
+set.seed (1)
+train = sample (1: nrow(Boston ), nrow(Boston )/2)
+boston.test = Boston [-train ,"medv"]
+
+```
+
+
+
+
+## Making the Generalized Boosted Regression Model gbm() ##
+```{r}
+boost.boston = gbm(medv~., data = Boston [train ,], distribution = "gaussian", n.trees = 5000, interaction.depth = 4)
+summary(boost.boston)
+```
+
+
+
+## Plotting statistically significant variables ##
+```{r }
+par(mfrow =c(1,2))
+plot(boost.boston ,i="rm")
+plot(boost.boston ,i="lstat")
+```
+
+
+
+## Predicting on test variable and calculating MSE ##
+```{r}
+yhat.boost=predict (boost.boston ,newdata =Boston [-train ,],n.trees =5000)
+mean(( yhat.boost -boston.test)^2)
+```
+
+
+
+## Changing shrinkage factor of the gbm() function to imporve model ##
+```{r}
+boost.boston =gbm(medv~.,data=Boston [train ,], distribution= "gaussian",n.trees =5000 , interaction.depth =4, 
+                  shrinkage =0.2,verbose =F)
+```
+
+
+
+## Predicting on test variable with updated shrinkage value and calculating MSE ##
+```{r}
+yhat.boost=predict (boost.boston ,newdata =Boston [-train ,],n.trees =5000)
+mean(( yhat.boost -boston.test)^2)
+```
+

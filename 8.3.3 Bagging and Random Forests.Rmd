@@ -1,0 +1,75 @@
+---
+title: "8.3.3 Bagging and Random Forests"
+author: "Group 15"
+date: "2/28/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE) 
+```
+
+## Bagging random forest
+
+Apply bagging and random forests to the Boston dataset, using randomForest package.
+Bagging is a special case of a random forest where m = p.
+Results obtained will depend on version of R and randomForest package.
+
+```{r bagging and random forests}
+library(MASS) # to get Boston data
+data(Boston)
+library(randomForest)
+set.seed(1)
+train = sample(1:nrow(Boston), nrow(Boston)/2)
+bag.boston = randomForest(medv~., data=Boston, subset=train, mtry=13, importance=TRUE)
+bag.boston
+```
+
+## How well does this bagged model perform?
+
+Argument mtry=13 indicates that all 13 predictors should be considered for each split of the tree.
+Bagged model performance on the test set:
+
+```{r model on test set}
+yhat.bag = predict(bag.boston, newdata=Boston[-train,])
+boston.test = Boston[-train, "medv"]
+plot(yhat.bag, boston.test)
+abline (0, 1)
+mean((yhat.bag - boston.test)^2)
+```
+
+Test MSE may differ from the book depending on version of R. 
+Change number of trees by adjusting _____ argument.
+```{r}
+bag.boston = randomForest(medv~., data=Boston, subset=train, mtry=13, ntree=25)
+yhat.bag = predict(bag.boston, newdata=Boston[-train,])
+mean((yhat.bag - boston.test)^2)
+```
+By default, random forest uses ___ variables for regression trees and ___ variables for classification trees.
+The book uses mtry = 6 here.
+
+```{r}
+set.seed(1)
+rf.boston = randomForest(medv~., data=Boston, subset=train, mtry=6, importance=TRUE)
+yhat.rf = predict(rf.boston, newdata=Boston[-train,])
+mean((yhat.rf - boston.test)^2)
+```
+Test set is lower than before, so random forests is an improvement over bagging in this case.
+
+Use importance() to view the importance of each variable:
+
+```{r}
+importance(rf.boston )
+```
+%IncMSE gives mean decrease of accuracy in predictions on the out of bag samples
+when a given variable is excluded from the model.
+
+IncNodePurity measures the total decrease in node impurity (measured by RSS in the case 
+of regression trees) that results from splits over that variable, averaged over all trees.
+
+We can also produce a plot of these importance measures using varImpPlot(). 
+
+```{r}
+varImpPlot(rf.boston )
+```
+
