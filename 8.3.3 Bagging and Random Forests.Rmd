@@ -41,6 +41,7 @@ mean((yhat.bag - boston.test)^2)
 Test MSE may differ from the book depending on version of R. 
 Change number of trees by adjusting ntree argument (500 by default).
 ```{r}
+set.seed(1)
 bag.boston = randomForest(medv~., data=Boston, subset=train, mtry=13, ntree=25)
 yhat.bag = predict(bag.boston, newdata=Boston[-train,])
 mean((yhat.bag - boston.test)^2)
