@@ -17,11 +17,8 @@ and a test set consisting of the remaining observations.
 ```{r }
 library(ISLR)
 data(Caravan)
-Caravan$Purchase <- ifelse(Caravan$Purchase == 'Yes',1,0)
 Caravan$Purchase <- as.factor(Caravan$Purchase)
 library(randomForest)
-#Train <- Caravan[1:1000,]
-#Test <- Caravan[-(1:1000),]
 Train = sample(1:1000, 1000)
 caravan.test = Caravan[-Train, "Purchase"]
 ```
